@@ -185,6 +185,10 @@ public class ElectionAppServer implements ReplicaNode.LogCommandExecutor {
         return myReplicaNode;
     }
     
+    public ElectionServiceImpl getElectionService() {
+        return electionService;
+    }
+    
     public static void main(String[] args) {
         if (args.length != 4) {
             System.out.println("Usage: java -cp ... ElectionAppServer <zookeeper_host:port> <grpc_port> <log_file> <snapshot_dir>");
