@@ -4,6 +4,7 @@ import java.util.List;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 
+import io.grpc.okhttp.OkHttpChannelBuilder;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import rs.fink.pds.faulttolerance.core.SyncPrimitive;
@@ -36,19 +37,19 @@ public class ElectionClient extends SyncPrimitive {
     }
     
     private void newLeaderAwaiting() throws KeeperException, InterruptedException {
-        System.out.println("Searching for new leader!");
+        System.out.println("Awaiting ZooKeeper notification or timeout");
         synchronized(zkNotifier) {
-            zkNotifier.wait();
+            zkNotifier.wait(5000);
         }
         checkLeader();
     }
     
     public synchronized void checkLeader() throws KeeperException, InterruptedException {
-        List<String> list = zk.getChildren(appRoot, false);
-        System.out.println("Total replicas: " + list.size());
+        List<String> list = zk.getChildren(appRoot, true); //true prosledjujem da bi se aktivirao watcher
         
-        if (list.size() == 0) {
-            System.out.println("No replicas available!");
+        if (list.isEmpty()) {
+            System.out.println("No replicas available! Awaiting for servers...");
+            newLeaderAwaiting();
             return;
         }
         
@@ -68,17 +69,41 @@ public class ElectionClient extends SyncPrimitive {
         if (leaderNodeName == null || !minNodeName.equals(leaderNodeName)) {
             leaderNodeName = minNodeName;
             byte[] b = zk.getData(appRoot + "/" + leaderNodeName, true, null);
-            leaderHostNamePort = new String(b);
+            if (b != null) {
+                leaderHostNamePort = new String(b, java.nio.charset.StandardCharsets.UTF_8).trim();
+            }
             System.out.println("Leader is: " + leaderNodeName + " at " + leaderHostNamePort);
             blockingStub = getBlockingStub(leaderHostNamePort);
         }
     }
     
     private AccountServiceGrpc.AccountServiceBlockingStub getBlockingStub(String hostNamePort) {
-        String[] splits = hostNamePort.split(":");
-        channel = ManagedChannelBuilder.forAddress(splits[0], Integer.parseInt(splits[1]))
-            .usePlaintext()
-            .build();
+        // Ocisti string od SVIH nevidljivih karaktera, razmaka i smeca
+        // Zadrzavamo samo brojeve, tacku i dvotacku
+        String cleanAddress = hostNamePort.replaceAll("[^0-9.:]", "");
+        
+        System.out.println("DEBUG: Original address: [" + hostNamePort + "]");
+        System.out.println("DEBUG: Cleaned address: [" + cleanAddress + "]");
+
+        String[] splits = cleanAddress.split(":");
+        if (splits.length < 2) {
+            throw new IllegalArgumentException("Invalid host:port format after cleaning: " + cleanAddress);
+        }
+
+        String host = splits[0].trim();
+        int port = Integer.parseInt(splits[1].trim());
+
+        System.out.println("DEBUG: Connecting to gRPC host: [" + host + "] port: [" + port + "]");
+
+        // Zatvori stari kanal ako postoji
+        if (channel != null) {
+            channel.shutdownNow();
+        }
+
+        channel = OkHttpChannelBuilder.forAddress(host, port)
+                .usePlaintext()
+                .build();
+        
         return AccountServiceGrpc.newBlockingStub(channel);
     }
     
@@ -109,6 +134,7 @@ public class ElectionClient extends SyncPrimitive {
             }
         } catch (Exception e) {
             System.err.println("Error submitting result: " + e.getMessage());
+            e.printStackTrace();
             try {
                 newLeaderAwaiting();
             } catch (Exception ex) {

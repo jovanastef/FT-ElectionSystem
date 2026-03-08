@@ -145,6 +145,53 @@ public class ElectionAppServer implements ReplicaNode.LogCommandExecutor {
         }
     }
     
+    //helper metod za dodavanje rezultata sa individualnim parametrima
+    //koristi se od strane grpc servera
+    public boolean addVotingResult(int pollingStationId, String controllerId, 
+            int totalVoters, int invalidBallots) {
+    	if (myReplicaNode == null || myReplicaNode.getReplicatedLog() == null) {
+            System.err.println("SERVER NOT READY: ReplicaNode or Log is null!");
+            return false;
+        }
+    	
+    	System.out.println("DEBUG: addVotingResult called - station=" + pollingStationId);
+    	
+    	// Proveri da li smo lider
+		if (!myReplicaNode.isLeader()) {
+			System.err.println("Not leader, rejecting request for station #" + pollingStationId);
+			return false;
+		}
+		
+		try {
+			System.out.println("DEBUG: Creating AddVotingResultCommand");
+			// Kreiraj komandu sa svim potrebnim podacima
+			AddVotingResultCommand command = new AddVotingResultCommand(
+				pollingStationId,
+				controllerId,
+				totalVoters,
+				invalidBallots,
+				"parlamentarni"  // electionType
+			);
+			
+			System.out.println("DEBUG: Calling appendAndReplicate");
+			
+			// Upisi u log i repliciraj
+			myReplicaNode.getReplicatedLog().appendAndReplicate(command.serialize());
+			
+			System.out.println("Voting result logged for station #" + pollingStationId);
+			return true;
+			
+		} catch (IOException e) {
+	        System.err.println("Log error: " + e.getMessage());
+	        e.printStackTrace(); 
+	        return false;
+	    } catch (Exception e) {
+	        System.err.println("Unexpected error: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+	        e.printStackTrace();  
+	        return false;
+	    }
+    }
+    
     public AccountResponse getStatistics(AccountRequest request) {
         ElectionServiceImpl.ElectionStatistics stats = electionService.getStatistics("all");
         
@@ -160,6 +207,11 @@ public class ElectionAppServer implements ReplicaNode.LogCommandExecutor {
     }
     
     public void start() throws IOException, KeeperException, InterruptedException {
+    	myReplicaNode.leaderElection();
+        myReplicaNode.start();
+        
+        Thread.sleep(1000);
+        
         gRPCServer = ServerBuilder
             .forPort(Integer.parseInt(myReplicaNode.getMyGRPCAddress().split(":")[1]))
             .addService(new ElectionServiceGRPCServer(this))
@@ -167,8 +219,7 @@ public class ElectionAppServer implements ReplicaNode.LogCommandExecutor {
             .build();
         
         gRPCServer.start();
-        myReplicaNode.leaderElection();
-        myReplicaNode.start();
+        
         
         System.out.println("Election server started on: " + myReplicaNode.getMyGRPCAddress());
         gRPCServer.awaitTermination();
@@ -200,7 +251,7 @@ public class ElectionAppServer implements ReplicaNode.LogCommandExecutor {
             int gRPCPort = Integer.parseInt(args[1]);
             String logFileName = args[2];
             String snapshotDir = args[3];
-            String myGRPCAddress = InetAddress.getLocalHost().getHostName() + ":" + gRPCPort;
+            String myGRPCAddress = "127.0.0.1:" + gRPCPort;
             
             ElectionAppServer server = new ElectionAppServer(
                 zkConnectionString, APP_ROOT_NODE, myGRPCAddress, logFileName, snapshotDir);
@@ -213,6 +264,17 @@ public class ElectionAppServer implements ReplicaNode.LogCommandExecutor {
             }));
             
             server.start();
+            
+            new Thread(() -> {
+                try {
+                    Thread.sleep(5000);
+                    System.out.println("Testing addVotingResult directly...");
+                    boolean result = server.addVotingResult(999, "TEST_CTRL", 100, 0);
+                    System.out.println("Direct test result: " + result);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
             
         } catch (IOException e) {
             System.err.println("IO Error: " + e.getMessage());

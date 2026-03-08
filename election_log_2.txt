@@ -1,0 +1,4 @@
+ADD_VOTING_RESULT|1|CTRL_1|850|0|parlamentarni
+ADD_VOTING_RESULT|1|CTRL_1|850|0|parlamentarni
+ADD_VOTING_RESULT|2|CTRL_2|920|0|parlamentarni
+ADD_VOTING_RESULT|2|CTRL_2|920|0|parlamentarni

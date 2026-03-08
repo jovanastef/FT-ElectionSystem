@@ -1,0 +1,53 @@
+{
+  "election": {
+    "name": "Parlamentarni izbori 2026",
+    "type": "parliamentary",
+    "numberOfPollingStations": 1000,
+    "registeredVotersPerStation": 1000,
+    "controllersPerStation": 3,
+    "minimumControllersForValidation": 2,
+    "electionTypes": ["lokalni", "parlamentarni", "predsednicki"]
+  },
+  "candidates": {
+    "presidential": [
+      "Kandidat A - Predsednicki",
+      "Kandidat B - Predsednicki", 
+      "Kandidat C - Predsednicki"
+    ],
+    "parliamentary": [
+      "Lista 1 - Koalicija 1",
+      "Lista 2 - Koalicija 2",
+      "Lista 3 - Koalicija 3",
+      "Lista 4 - Koalicija 4",
+      "Lista 5 - Manjinska koalicija"
+    ],
+    "local": [
+      "Lokalni kandidat 1",
+      "Lokalni kandidat 2"
+    ]
+  },
+  "server": {
+    "zookeeper": {
+      "host": "localhost",
+      "port": 2181,
+      "sessionTimeout": 3000,
+      "connectionTimeout": 3000
+    },
+    "grpc": {
+      "port": 50051,
+      "usePlaintext": true
+    },
+    "replication": {
+      "logFileName": "election_log.txt",
+      "snapshotDir": "snapshots/",
+      "snapshotThreshold": 1000,
+      "maxSnapshotsToKeep": 3
+    }
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "logs/election.log",
+    "maxFileSize": "10MB",
+    "maxBackupIndex": 10
+  }
+}
