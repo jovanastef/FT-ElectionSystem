@@ -25,12 +25,23 @@ public interface AccountRequestOrBuilder extends
   float getAmount();
 
   /**
-   * <code>.AccountRequestType op_type = 3;</code>
+   * <code>optional int32 invalid_ballots = 3;</code>
+   * @return Whether the invalidBallots field is set.
+   */
+  boolean hasInvalidBallots();
+  /**
+   * <code>optional int32 invalid_ballots = 3;</code>
+   * @return The invalidBallots.
+   */
+  int getInvalidBallots();
+
+  /**
+   * <code>.AccountRequestType op_type = 4;</code>
    * @return The enum numeric value on the wire for opType.
    */
   int getOpTypeValue();
   /**
-   * <code>.AccountRequestType op_type = 3;</code>
+   * <code>.AccountRequestType op_type = 4;</code>
    * @return The opType.
    */
   rs.fink.pds.faulttolerance.gRPC.AccountRequestType getOpType();

@@ -8,7 +8,8 @@ import rs.fink.pds.election.model.ElectionState;
 public class SnapshotManager {
     private static final String SNAPSHOT_DIR = "snapshots/";
     private static final String SNAPSHOT_PREFIX = "snapshot_";
-    private static final long SNAPSHOT_THRESHOLD = 1000; // commands before snapshot
+    //private static final long SNAPSHOT_THRESHOLD = 1000; // commands before snapshot
+    private static final long SNAPSHOT_THRESHOLD = 5; // 5 za testiranje
     
     private final String baseDir;
     private long lastSnapshotIndex = 0;

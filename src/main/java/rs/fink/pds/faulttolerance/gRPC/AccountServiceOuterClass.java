@@ -33,23 +33,24 @@ public final class AccountServiceOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\025account_service.proto\"j\n\016AccountReques" +
-      "t\022\022\n\nrequest_id\030\001 \001(\005\022\023\n\006amount\030\002 \001(\002H\000\210" +
-      "\001\001\022$\n\007op_type\030\003 \001(\0162\023.AccountRequestType" +
-      "B\t\n\007_amount\"\211\001\n\017AccountResponse\022\036\n\006statu" +
-      "s\030\001 \001(\0162\016.RequestStatus\022\022\n\nrequest_id\030\002 " +
-      "\001(\005\022\024\n\007balance\030\003 \001(\002H\000\210\001\001\022\024\n\007message\030\004 \001" +
-      "(\tH\001\210\001\001B\n\n\010_balanceB\n\n\010_message*6\n\022Accou" +
-      "ntRequestType\022\007\n\003GET\020\000\022\007\n\003ADD\020\001\022\016\n\nWITHD" +
-      "RAWAL\020\002*k\n\rRequestStatus\022\r\n\tSTATUS_OK\020\000\022" +
-      "\036\n\032UPDATE_REJECTED_NOT_LEADER\020\001\022+\n\'WITHD" +
-      "RAWAL_REJECT_NOT_SUFFICIENT_AMOUNT\020\0022\253\001\n" +
-      "\016AccountService\0220\n\tAddAmount\022\017.AccountRe" +
-      "quest\032\020.AccountResponse\"\000\0225\n\016WithdrawAmo" +
-      "unt\022\017.AccountRequest\032\020.AccountResponse\"\000" +
-      "\0220\n\tGetAmount\022\017.AccountRequest\032\020.Account" +
-      "Response\"\000B#\n\037rs.fink.pds.faulttolerance" +
-      ".gRPCP\001b\006proto3"
+      "\n\025account_service.proto\"\234\001\n\016AccountReque" +
+      "st\022\022\n\nrequest_id\030\001 \001(\005\022\023\n\006amount\030\002 \001(\002H\000" +
+      "\210\001\001\022\034\n\017invalid_ballots\030\003 \001(\005H\001\210\001\001\022$\n\007op_" +
+      "type\030\004 \001(\0162\023.AccountRequestTypeB\t\n\007_amou" +
+      "ntB\022\n\020_invalid_ballots\"\211\001\n\017AccountRespon" +
+      "se\022\036\n\006status\030\001 \001(\0162\016.RequestStatus\022\022\n\nre" +
+      "quest_id\030\002 \001(\005\022\024\n\007balance\030\003 \001(\002H\000\210\001\001\022\024\n\007" +
+      "message\030\004 \001(\tH\001\210\001\001B\n\n\010_balanceB\n\n\010_messa" +
+      "ge*6\n\022AccountRequestType\022\007\n\003GET\020\000\022\007\n\003ADD" +
+      "\020\001\022\016\n\nWITHDRAWAL\020\002*k\n\rRequestStatus\022\r\n\tS" +
+      "TATUS_OK\020\000\022\036\n\032UPDATE_REJECTED_NOT_LEADER" +
+      "\020\001\022+\n\'WITHDRAWAL_REJECT_NOT_SUFFICIENT_A" +
+      "MOUNT\020\0022\253\001\n\016AccountService\0220\n\tAddAmount\022" +
+      "\017.AccountRequest\032\020.AccountResponse\"\000\0225\n\016" +
+      "WithdrawAmount\022\017.AccountRequest\032\020.Accoun" +
+      "tResponse\"\000\0220\n\tGetAmount\022\017.AccountReques" +
+      "t\032\020.AccountResponse\"\000B#\n\037rs.fink.pds.fau" +
+      "lttolerance.gRPCP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -60,7 +61,7 @@ public final class AccountServiceOuterClass {
     internal_static_AccountRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_AccountRequest_descriptor,
-        new java.lang.String[] { "RequestId", "Amount", "OpType", "Amount", });
+        new java.lang.String[] { "RequestId", "Amount", "InvalidBallots", "OpType", "Amount", "InvalidBallots", });
     internal_static_AccountResponse_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_AccountResponse_fieldAccessorTable = new

@@ -1,6 +1,8 @@
 package rs.fink.pds.election.client;
 
 import java.util.List;
+import java.util.Random;
+
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 
@@ -118,6 +120,7 @@ public class ElectionClient extends SyncPrimitive {
                 .setRequestId(stationId)
                 .setOpType(AccountRequestType.ADD)
                 .setAmount(totalVoters)
+                .setInvalidBallots(invalidBallots)
                 .build();
             
             AccountResponse response = blockingStub.addAmount(request);
@@ -188,12 +191,20 @@ public class ElectionClient extends SyncPrimitive {
             System.out.println("\nSimulating voting result submissions from controllers...\n");
             
             // Simuliraj unos rezultata od vise kontrolora za isto mesto
-            client.submitVotingResult(1, 850, 12);   // Kontrolor 1
-            client.submitVotingResult(1, 850, 12);   // Kontrolor 2 (isti rezultat = validno)
+           // client.submitVotingResult(1, 850, 12);   // Kontrolor 1
+           // client.submitVotingResult(1, 850, 12);   // Kontrolor 2 (isti rezultat = validno)
             
             // Drugo biracko mesto
-            client.submitVotingResult(2, 920, 8);
-            client.submitVotingResult(2, 920, 8);
+           // client.submitVotingResult(2, 920, 8);
+           // client.submitVotingResult(2, 920, 8);
+            // Test za 10 stanica
+            Random rand = new Random();
+            for (int i = 1; i <= 10; i++) {
+                int voters = 800 + rand.nextInt(200);
+                int invalid = rand.nextInt(30);
+                client.submitVotingResult(i, voters, invalid);
+                client.submitVotingResult(i, voters, invalid); // Drugi kontrolor
+            }
             
             System.out.println("\nFetching election statistics...\n");
             client.getStatistics();

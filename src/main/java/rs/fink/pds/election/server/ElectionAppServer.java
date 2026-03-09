@@ -44,6 +44,8 @@ public class ElectionAppServer implements ReplicaNode.LogCommandExecutor {
     @Override
     public void executeReplicatedLogCommand(byte[] commandBytes) {
         String commandStr = new String(commandBytes);
+        System.out.println("[EXEC] Executing command: " + commandStr);
+        
         String[] parts = commandStr.split("\\|");
         
         if (parts.length < 1) return;
@@ -66,7 +68,8 @@ public class ElectionAppServer implements ReplicaNode.LogCommandExecutor {
     }
     
     private void executeAddVotingResult(String[] parts) {
-        // ADD_VOTING_RESULT|stationId|controllerId|totalVoters|invalidBallots|electionType
+    	System.out.println("[EXEC] executeAddVotingResult: " + String.join("|", parts));
+    	// ADD_VOTING_RESULT|stationId|controllerId|totalVoters|invalidBallots|electionType
         try {
             int stationId = Integer.parseInt(parts[1]);
             String controllerId = parts[2];
@@ -74,11 +77,15 @@ public class ElectionAppServer implements ReplicaNode.LogCommandExecutor {
             int invalidBallots = Integer.parseInt(parts[4]);
             String electionType = parts[5];
             
+            System.out.println("[EXEC] Calling electionService.addVotingResult...");
             electionService.addVotingResult(stationId, controllerId, totalVoters, 
                                            invalidBallots, new java.util.HashMap<>(), 
                                            new java.util.HashMap<>());
+            
+            System.out.println("[EXEC] Command executed successfully!");
         } catch (Exception e) {
             System.err.println("Error executing AddVotingResult: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
@@ -178,8 +185,13 @@ public class ElectionAppServer implements ReplicaNode.LogCommandExecutor {
 			// Upisi u log i repliciraj
 			myReplicaNode.getReplicatedLog().appendAndReplicate(command.serialize());
 			
-			System.out.println("Voting result logged for station #" + pollingStationId);
-			return true;
+			System.out.println("DEBUG: Executing command directly on leader");
+	        electionService.addVotingResult(pollingStationId, controllerId, totalVoters,
+	                                       invalidBallots, new java.util.HashMap<>(),
+	                                       new java.util.HashMap<>());
+	        
+	        System.out.println("Voting result logged for station #" + pollingStationId);
+	        return true;
 			
 		} catch (IOException e) {
 	        System.err.println("Log error: " + e.getMessage());

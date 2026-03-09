@@ -213,10 +213,12 @@ public class ReplicaNode extends ReplicatedLogServiceImplBase implements Runnabl
 				try { 
 					replicatedLog.appendToLocalLog(commandBytes);
 					
-					// Izvrsavanje replikovane komande u posebnom threadu i to na AppServeru!
-					// Razlog: da se odmah vrati potvrda lideru da je komanda primljena, 
-					// a za to vreme da se ona izvrsava! 
-					commandThreadPoolExecutor.submit(()->logCommandExecutor.executeReplicatedLogCommand(commandBytes));
+					if (!isLeader()) {
+		                // Samo followeri izvrsavaju komande
+		                commandThreadPoolExecutor.submit(
+		                    ()->logCommandExecutor.executeReplicatedLogCommand(commandBytes)
+		                );
+		            }
 					
 					response = LogResponse.newBuilder().
 							setStatus(LogStatus.LOG_OK).

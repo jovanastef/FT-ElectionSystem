@@ -17,7 +17,8 @@ enum AccountRequestType {
 message AccountRequest {
   int32 request_id = 1;
   optional float amount = 2;
-  AccountRequestType op_type = 3;
+  optional int32 invalid_ballots = 3;
+  AccountRequestType op_type = 4;
 }
 
 enum RequestStatus {

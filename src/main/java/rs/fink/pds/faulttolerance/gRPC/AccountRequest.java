@@ -70,17 +70,36 @@ private static final long serialVersionUID = 0L;
     return amount_;
   }
 
-  public static final int OP_TYPE_FIELD_NUMBER = 3;
+  public static final int INVALID_BALLOTS_FIELD_NUMBER = 3;
+  private int invalidBallots_ = 0;
+  /**
+   * <code>optional int32 invalid_ballots = 3;</code>
+   * @return Whether the invalidBallots field is set.
+   */
+  @java.lang.Override
+  public boolean hasInvalidBallots() {
+    return ((bitField0_ & 0x00000002) != 0);
+  }
+  /**
+   * <code>optional int32 invalid_ballots = 3;</code>
+   * @return The invalidBallots.
+   */
+  @java.lang.Override
+  public int getInvalidBallots() {
+    return invalidBallots_;
+  }
+
+  public static final int OP_TYPE_FIELD_NUMBER = 4;
   private int opType_ = 0;
   /**
-   * <code>.AccountRequestType op_type = 3;</code>
+   * <code>.AccountRequestType op_type = 4;</code>
    * @return The enum numeric value on the wire for opType.
    */
   @java.lang.Override public int getOpTypeValue() {
     return opType_;
   }
   /**
-   * <code>.AccountRequestType op_type = 3;</code>
+   * <code>.AccountRequestType op_type = 4;</code>
    * @return The opType.
    */
   @java.lang.Override public rs.fink.pds.faulttolerance.gRPC.AccountRequestType getOpType() {
@@ -108,8 +127,11 @@ private static final long serialVersionUID = 0L;
     if (((bitField0_ & 0x00000001) != 0)) {
       output.writeFloat(2, amount_);
     }
+    if (((bitField0_ & 0x00000002) != 0)) {
+      output.writeInt32(3, invalidBallots_);
+    }
     if (opType_ != rs.fink.pds.faulttolerance.gRPC.AccountRequestType.GET.getNumber()) {
-      output.writeEnum(3, opType_);
+      output.writeEnum(4, opType_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -128,9 +150,13 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeFloatSize(2, amount_);
     }
+    if (((bitField0_ & 0x00000002) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(3, invalidBallots_);
+    }
     if (opType_ != rs.fink.pds.faulttolerance.gRPC.AccountRequestType.GET.getNumber()) {
       size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(3, opType_);
+        .computeEnumSize(4, opType_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -155,6 +181,11 @@ private static final long serialVersionUID = 0L;
           != java.lang.Float.floatToIntBits(
               other.getAmount())) return false;
     }
+    if (hasInvalidBallots() != other.hasInvalidBallots()) return false;
+    if (hasInvalidBallots()) {
+      if (getInvalidBallots()
+          != other.getInvalidBallots()) return false;
+    }
     if (opType_ != other.opType_) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
@@ -173,6 +204,10 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + AMOUNT_FIELD_NUMBER;
       hash = (53 * hash) + java.lang.Float.floatToIntBits(
           getAmount());
+    }
+    if (hasInvalidBallots()) {
+      hash = (37 * hash) + INVALID_BALLOTS_FIELD_NUMBER;
+      hash = (53 * hash) + getInvalidBallots();
     }
     hash = (37 * hash) + OP_TYPE_FIELD_NUMBER;
     hash = (53 * hash) + opType_;
@@ -307,6 +342,7 @@ private static final long serialVersionUID = 0L;
       bitField0_ = 0;
       requestId_ = 0;
       amount_ = 0F;
+      invalidBallots_ = 0;
       opType_ = 0;
       return this;
     }
@@ -350,6 +386,10 @@ private static final long serialVersionUID = 0L;
         to_bitField0_ |= 0x00000001;
       }
       if (((from_bitField0_ & 0x00000004) != 0)) {
+        result.invalidBallots_ = invalidBallots_;
+        to_bitField0_ |= 0x00000002;
+      }
+      if (((from_bitField0_ & 0x00000008) != 0)) {
         result.opType_ = opType_;
       }
       result.bitField0_ |= to_bitField0_;
@@ -372,6 +412,9 @@ private static final long serialVersionUID = 0L;
       }
       if (other.hasAmount()) {
         setAmount(other.getAmount());
+      }
+      if (other.hasInvalidBallots()) {
+        setInvalidBallots(other.getInvalidBallots());
       }
       if (other.opType_ != 0) {
         setOpTypeValue(other.getOpTypeValue());
@@ -413,10 +456,15 @@ private static final long serialVersionUID = 0L;
               break;
             } // case 21
             case 24: {
-              opType_ = input.readEnum();
+              invalidBallots_ = input.readInt32();
               bitField0_ |= 0x00000004;
               break;
             } // case 24
+            case 32: {
+              opType_ = input.readEnum();
+              bitField0_ |= 0x00000008;
+              break;
+            } // case 32
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -506,27 +554,67 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
+    private int invalidBallots_ ;
+    /**
+     * <code>optional int32 invalid_ballots = 3;</code>
+     * @return Whether the invalidBallots field is set.
+     */
+    @java.lang.Override
+    public boolean hasInvalidBallots() {
+      return ((bitField0_ & 0x00000004) != 0);
+    }
+    /**
+     * <code>optional int32 invalid_ballots = 3;</code>
+     * @return The invalidBallots.
+     */
+    @java.lang.Override
+    public int getInvalidBallots() {
+      return invalidBallots_;
+    }
+    /**
+     * <code>optional int32 invalid_ballots = 3;</code>
+     * @param value The invalidBallots to set.
+     * @return This builder for chaining.
+     */
+    public Builder setInvalidBallots(int value) {
+
+      invalidBallots_ = value;
+      bitField0_ |= 0x00000004;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 invalid_ballots = 3;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearInvalidBallots() {
+      bitField0_ = (bitField0_ & ~0x00000004);
+      invalidBallots_ = 0;
+      onChanged();
+      return this;
+    }
+
     private int opType_ = 0;
     /**
-     * <code>.AccountRequestType op_type = 3;</code>
+     * <code>.AccountRequestType op_type = 4;</code>
      * @return The enum numeric value on the wire for opType.
      */
     @java.lang.Override public int getOpTypeValue() {
       return opType_;
     }
     /**
-     * <code>.AccountRequestType op_type = 3;</code>
+     * <code>.AccountRequestType op_type = 4;</code>
      * @param value The enum numeric value on the wire for opType to set.
      * @return This builder for chaining.
      */
     public Builder setOpTypeValue(int value) {
       opType_ = value;
-      bitField0_ |= 0x00000004;
+      bitField0_ |= 0x00000008;
       onChanged();
       return this;
     }
     /**
-     * <code>.AccountRequestType op_type = 3;</code>
+     * <code>.AccountRequestType op_type = 4;</code>
      * @return The opType.
      */
     @java.lang.Override
@@ -535,7 +623,7 @@ private static final long serialVersionUID = 0L;
       return result == null ? rs.fink.pds.faulttolerance.gRPC.AccountRequestType.UNRECOGNIZED : result;
     }
     /**
-     * <code>.AccountRequestType op_type = 3;</code>
+     * <code>.AccountRequestType op_type = 4;</code>
      * @param value The opType to set.
      * @return This builder for chaining.
      */
@@ -543,17 +631,17 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
         throw new NullPointerException();
       }
-      bitField0_ |= 0x00000004;
+      bitField0_ |= 0x00000008;
       opType_ = value.getNumber();
       onChanged();
       return this;
     }
     /**
-     * <code>.AccountRequestType op_type = 3;</code>
+     * <code>.AccountRequestType op_type = 4;</code>
      * @return This builder for chaining.
      */
     public Builder clearOpType() {
-      bitField0_ = (bitField0_ & ~0x00000004);
+      bitField0_ = (bitField0_ & ~0x00000008);
       opType_ = 0;
       onChanged();
       return this;

@@ -1,7 +1,10 @@
 package rs.fink.pds.election.server;
 
+import java.io.IOException;
+
 import io.grpc.stub.StreamObserver;
 import rs.fink.pds.faulttolerance.gRPC.*;
+import rs.fink.pds.election.commands.CreateSnapshotCommand;
 import rs.fink.pds.election.server.ElectionServiceImpl.ElectionStatistics;
 
 public class ElectionServiceGRPCServer extends AccountServiceGrpc.AccountServiceImplBase {
@@ -19,9 +22,14 @@ public class ElectionServiceGRPCServer extends AccountServiceGrpc.AccountService
     		System.out.println("DEBUG: addAmount called with requestId=" + request.getRequestId());
     		int pollingStationId = request.getRequestId();
             int totalVoters = (int) request.getAmount();
-            int invalidBallots = 0; // Default, moze se dodati u request
-            String controllerId = "CTRL_" + request.getRequestId(); // Placeholder
+            int invalidBallots = request.hasInvalidBallots() 
+                    ? request.getInvalidBallots() 
+                    : 0; //citaj iz requesta
+            String controllerId = "CTRL_" + pollingStationId + "_" + 
+                    System.currentTimeMillis() + "_" + 
+                    (int)(Math.random() * 1000);
             
+            System.out.println("DEBUG: Generated controllerId=" + controllerId);
             System.out.println("DEBUG: Calling electionAppServer.addVotingResult()");
             
             boolean success = electionAppServer.addVotingResult(
@@ -30,6 +38,20 @@ public class ElectionServiceGRPCServer extends AccountServiceGrpc.AccountService
                 totalVoters, 
                 invalidBallots
             );
+            
+            // Dodaj snapshot nakon svake uspesne operacije (za testiranje)
+            if (success && request.getRequestId() % 5 == 0) {
+                try {
+                    long logIndex = electionAppServer.getReplicaNode()
+                        .getReplicatedLog().getLastLogEntryIndex();
+                    CreateSnapshotCommand snapshotCmd = new CreateSnapshotCommand(logIndex);
+                    electionAppServer.getReplicaNode().getReplicatedLog()
+                        .appendAndReplicate(snapshotCmd.serialize());
+                    System.out.println("Snapshot triggered at index: " + logIndex);
+                } catch (IOException e) {
+                    System.err.println("Failed to create snapshot: " + e.getMessage());
+                }
+            }
             
             System.out.println("DEBUG: addVotingResult returned: " + success);
             

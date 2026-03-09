@@ -32,7 +32,10 @@ public class ElectionServiceImpl {
                                                 int totalVoters, int invalidBallots, 
                                                 Map<String, Integer> candidateVotes,
                                                 Map<String, Integer> listVotes) {
-        PollingStation station = electionState.getPollingStation(pollingStationId);
+    	System.out.println("DEBUG [Service]: Adding result - station=" + pollingStationId + 
+                ", controller=" + controllerId);
+    	
+    	PollingStation station = electionState.getPollingStation(pollingStationId);
         if (station == null) {
             System.err.println("Polling station not found: " + pollingStationId);
             return false;
@@ -53,6 +56,8 @@ public class ElectionServiceImpl {
         
         // Proveri da li imamo vecinu kontrolora
         Map<String, VotingResult> controllerResults = stationControllerResults.get(pollingStationId);
+        System.out.println("DEBUG [Service]: Controller count for station " + pollingStationId + 
+                " = " + controllerResults.size());
         if (controllerResults.size() >= 2) {
             // Verifikuj da li se rezultati poklapaju
             if (verifyResultsMajority(pollingStationId)) {
@@ -67,7 +72,8 @@ public class ElectionServiceImpl {
             }
         }
         
-        System.out.println("Waiting for more controllers at station: " + pollingStationId);
+        System.out.println("Waiting for more controllers at station: " + pollingStationId + 
+                " (have " + controllerResults.size() + "/2)");
         return true;
     }
     
@@ -139,8 +145,30 @@ public class ElectionServiceImpl {
     }
     
     public void loadFromSnapshot(ElectionState state) {
-        // Load state from snapshot
-        // Implementation depends on serialization
+        System.out.println("Loading election state from snapshot...");
+        
+        // Kopiraj polling stations iz snapshot-a
+        this.electionState.getPollingStations().clear();
+        for (Map.Entry<Integer, PollingStation> entry : state.getPollingStations().entrySet()) {
+            // Kreiraj novu instancu da izbegnem reference
+            PollingStation original = entry.getValue();
+            PollingStation copy = new PollingStation(
+                original.getStationId(),
+                original.getElectionType(),
+                original.getRegisteredVoters()
+            );
+            copy.setVotingResult(original.getVotingResult());
+            copy.setNeedsReentry(original.isNeedsReentry());
+            this.electionState.addPollingStation(copy);
+        }
+        
+        // Kopiraj config
+        this.electionState.getConfig().getPresidentialCandidates()
+            .addAll(state.getConfig().getPresidentialCandidates());
+        // dodaj ostale liste po potrebi
+        
+        System.out.println("Election state loaded. Stations with results: " + 
+                          this.electionState.getStationsWithResults());
     }
     
     public static class ElectionStatistics {
